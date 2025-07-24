@@ -1,0 +1,14 @@
+kafka-python
+google-generativeai
+qdrant-client
+sentence-transformers
+psycopg2-binary
+python-dotenv
+streamlit
+pandas
+plotly
+fastapi
+uvicorn
+pydantic
+numpy
+scikit-learn
