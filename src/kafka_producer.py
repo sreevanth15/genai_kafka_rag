@@ -39,53 +39,80 @@ class EventProducer:
             {
                 "id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
-                "source": "auth_service",
-                "event_type": "login_attempt",
-                "message": "Failed login attempt for user john@example.com from IP 192.168.1.100",
+                "source": "security_scanner",
+                "event_type": "vulnerability_detected",
+                "message": "Critical security vulnerability found in user upload module - SQL injection risk",
                 "metadata": {
-                    "user_email": "john@example.com",
-                    "ip_address": "192.168.1.100",
-                    "user_agent": "Mozilla/5.0",
-                    "attempt_count": 3
+                    "severity": "critical",
+                    "cve_id": "CVE-2024-1234",
+                    "affected_module": "file_upload",
+                    "scan_tool": "SecurityBot v2.1"
                 }
             },
             {
                 "id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
-                "source": "payment_service",
-                "event_type": "transaction",
-                "message": "Payment processing timeout for transaction ID 12345",
+                "source": "backup_service",
+                "event_type": "backup_failure",
+                "message": "Daily database backup failed - insufficient storage space on backup server",
                 "metadata": {
-                    "transaction_id": "12345",
-                    "amount": 299.99,
-                    "currency": "USD",
-                    "merchant": "example_store"
+                    "backup_type": "full_database",
+                    "storage_used": "95%",
+                    "required_space": "50GB",
+                    "server": "backup-srv-01"
                 }
             },
             {
                 "id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
-                "source": "api_gateway",
-                "event_type": "error",
-                "message": "Database connection timeout on /api/users endpoint",
+                "source": "cdn_service",
+                "event_type": "cache_miss",
+                "message": "High cache miss ratio detected - 78% of requests bypassing CDN cache",
                 "metadata": {
-                    "endpoint": "/api/users",
-                    "method": "GET",
-                    "response_time": 30000,
-                    "error_code": "DB_TIMEOUT"
+                    "cache_hit_ratio": "22%",
+                    "region": "eu-west-1",
+                    "total_requests": 15000,
+                    "bandwidth_cost": "$240/hour"
                 }
             },
             {
                 "id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
-                "source": "user_service",
-                "event_type": "registration",
-                "message": "New user registration from mobile app",
+                "source": "kubernetes_cluster",
+                "event_type": "pod_restart",
+                "message": "Pod 'payment-processor-7b8c9d' restarted due to memory limit exceeded",
                 "metadata": {
-                    "platform": "mobile",
-                    "app_version": "2.1.0",
-                    "device_type": "Android",
-                    "location": "New York, US"
+                    "pod_name": "payment-processor-7b8c9d",
+                    "namespace": "production",
+                    "memory_limit": "512Mi",
+                    "restart_count": 3
+                }
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "timestamp": datetime.now().isoformat(),
+                "source": "fraud_detection",
+                "event_type": "suspicious_transaction",
+                "message": "Potential fraud detected - multiple high-value transactions from new user account",
+                "metadata": {
+                    "user_id": "user_789012",
+                    "transaction_count": 5,
+                    "total_amount": 12500.00,
+                    "account_age_hours": 2,
+                    "risk_score": 0.92
+                }
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "timestamp": datetime.now().isoformat(),
+                "source": "load_balancer",
+                "event_type": "health_check_failure",
+                "message": "Backend server health check failed - server marked as unhealthy",
+                "metadata": {
+                    "server_ip": "10.0.2.45",
+                    "response_time": 5000,
+                    "status_code": 503,
+                    "consecutive_failures": 3
                 }
             }
         ]

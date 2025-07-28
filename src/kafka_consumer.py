@@ -24,7 +24,8 @@ class RAGKafkaConsumer:
         
         self.producer = KafkaProducer(
             bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
-            value_serializer=lambda m: json.dumps(m, default=str).encode('utf-8')
+            value_serializer=lambda m: json.dumps(m, default=str).encode('utf-8'),
+            key_serializer=lambda k: k.encode('utf-8') if k else None
         )
         
         self.rag_engine = RAGEngine()
@@ -96,19 +97,32 @@ class RAGKafkaConsumer:
                     tagged_event = self.process_event(raw_event)
                     
                     # Send to tagged events topic - FIXED: use model_dump()
-                    self.producer.send(
-                        settings.KAFKA_TAGGED_EVENTS_TOPIC,
-                        key=tagged_event.id,
-                        value=tagged_event.model_dump()  # ✅ Fixed deprecation
-                    )
+                    try:
+                        future = self.producer.send(
+                            settings.KAFKA_TAGGED_EVENTS_TOPIC,
+                            key=tagged_event.id,
+                            value=tagged_event.model_dump()  # ✅ Fixed deprecation
+                        )
+                        future.get(timeout=10)  # Wait for acknowledgment
+                        logger.debug(f"Successfully sent tagged event to Kafka: {tagged_event.id}")
+                    except Exception as kafka_error:
+                        logger.error(f"Failed to send tagged event to Kafka: {str(kafka_error)}")
+                        raise kafka_error
                     
                     # Store embedding for future RAG queries - FIXED: use model_dump()
-                    self.rag_engine.store_event_embedding(tagged_event.model_dump())  # ✅ Fixed deprecation
+                    try:
+                        self.rag_engine.store_event_embedding(tagged_event.model_dump())  # ✅ Fixed deprecation
+                        logger.debug(f"Successfully stored embedding: {tagged_event.id}")
+                    except Exception as rag_error:
+                        logger.error(f"Failed to store embedding: {str(rag_error)}")
+                        raise rag_error
                     
                     logger.info(f"✅ Tagged event {tagged_event.id}: {tagged_event.tags} ({tagged_event.priority})")
                     
                 except Exception as processing_error:
                     logger.error(f"Error processing individual event {raw_event.get('id', 'unknown')}: {str(processing_error)}")
+                    import traceback
+                    logger.error(f"Full traceback: {traceback.format_exc()}")
                     continue  # Continue with next event instead of crashing
                     
         except KeyboardInterrupt:
